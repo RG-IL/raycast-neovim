@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Action, ActionPanel, Grid, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Grid, Icon, List, showToast, Toast, Keyboard } from "@raycast/api";
 import { usePromise, useLocalStorage } from "@raycast/utils";
 import { getKeymaps, clearCache } from "./lib/commands";
 import { layout } from "./lib/preferences";
@@ -26,24 +26,23 @@ export default function NeovimCommands() {
   );
 
   const refreshAction = (
-    <Action title="Refresh Keymaps" icon={Icon.ArrowClockwise} onAction={async () => { clearCache(); await revalidate(); }} />
+    <Action
+      title="Refresh Keymaps"
+      icon={Icon.ArrowClockwise}
+      onAction={async () => {
+        clearCache();
+        await revalidate();
+      }}
+    />
   );
 
   function keymapActions(km: { lhs: string; rhs?: string; desc?: string; source?: string }, isFav: boolean) {
     return (
       <ActionPanel>
         <ActionPanel.Section>
-          <Action.CopyToClipboard
-            title="Copy Keymap"
-            content={km.lhs}
-            shortcut={{ modifiers: ["cmd"], key: "c" }}
-          />
+          <Action.CopyToClipboard title="Copy Keymap" content={km.lhs} shortcut={{ modifiers: ["cmd"], key: "c" }} />
           {km.rhs && (
-            <Action.CopyToClipboard
-              title="Copy Command"
-              content={km.rhs}
-              shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
-            />
+            <Action.CopyToClipboard title="Copy Command" content={km.rhs} shortcut={Keyboard.Shortcut.Common.Copy} />
           )}
         </ActionPanel.Section>
         <ActionPanel.Section>
@@ -66,9 +65,7 @@ export default function NeovimCommands() {
             />
           )}
         </ActionPanel.Section>
-        <ActionPanel.Section>
-          {refreshAction}
-        </ActionPanel.Section>
+        <ActionPanel.Section>{refreshAction}</ActionPanel.Section>
       </ActionPanel>
     );
   }
@@ -110,11 +107,7 @@ export default function NeovimCommands() {
       isLoading={isLoading}
       searchBarPlaceholder="Search Neovim keymaps..."
       searchBarAccessory={filterAccessory}
-      actions={
-        <ActionPanel>
-          {refreshAction}
-        </ActionPanel>
-      }
+      actions={<ActionPanel>{refreshAction}</ActionPanel>}
     >
       <List.Section title={filter === "favorites" ? "Favorites" : "All Keymaps"} subtitle={`${filtered?.length || 0}`}>
         {filtered?.map((km, i) => {
@@ -128,7 +121,13 @@ export default function NeovimCommands() {
               accessories={[
                 isFav ? { icon: Icon.Star } : {},
                 km.source && km.source !== "unknown"
-                  ? { tag: { value: km.source, color: km.source === "plugin" ? "#f4b8e4" : km.source === "user" ? "#81c8be" : "#838ba7" }, tooltip: `Source: ${km.source}` }
+                  ? {
+                      tag: {
+                        value: km.source,
+                        color: km.source === "plugin" ? "#f4b8e4" : km.source === "user" ? "#81c8be" : "#838ba7",
+                      },
+                      tooltip: `Source: ${km.source}`,
+                    }
                   : {},
               ]}
               actions={keymapActions(km, isFav)}

@@ -3,7 +3,7 @@
   "name": "neovim",
   "title": "Neovim",
   "description": "Manage Neovim sessions, plugins, and keymaps from Raycast",
-  "icon": "assets/icon.png",
+  "icon": "icon.png",
   "author": "raphael",
   "license": "MIT",
   "keywords": [

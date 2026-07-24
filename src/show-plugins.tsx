@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Grid, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Grid, Icon, List, showToast, Toast, Keyboard } from "@raycast/api";
 import { usePlugins } from "./lib/plugins";
 import { layout } from "./lib/preferences";
 
@@ -27,7 +27,7 @@ export default function ShowPlugins() {
                       <Action.OpenInBrowser
                         title="Open GitHub Page"
                         url={plugin.githubUrl}
-                        shortcut={{ modifiers: ["cmd"], key: "o" }}
+                        shortcut={Keyboard.Shortcut.Common.Open}
                       />
                     )}
                   </ActionPanel.Section>
@@ -40,7 +40,7 @@ export default function ShowPlugins() {
                     <Action.CopyToClipboard
                       title="Copy Commit Hash"
                       content={plugin.commit}
-                      shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+                      shortcut={Keyboard.Shortcut.Common.Copy}
                     />
                   </ActionPanel.Section>
                 </ActionPanel>
@@ -74,7 +74,7 @@ export default function ShowPlugins() {
                     <Action.OpenInBrowser
                       title="Open GitHub Page"
                       url={plugin.githubUrl}
-                      shortcut={{ modifiers: ["cmd"], key: "o" }}
+                      shortcut={Keyboard.Shortcut.Common.Open}
                     />
                   )}
                 </ActionPanel.Section>
@@ -87,7 +87,7 @@ export default function ShowPlugins() {
                   <Action.CopyToClipboard
                     title="Copy Commit Hash"
                     content={plugin.commit}
-                    shortcut={{ modifiers: ["cmd", "shift"], key: "c" }}
+                    shortcut={Keyboard.Shortcut.Common.Copy}
                   />
                 </ActionPanel.Section>
               </ActionPanel>

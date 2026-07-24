@@ -79,11 +79,16 @@ export async function getKeymaps(forceRefresh = false): Promise<KeymapEntry[]> {
       timeout: 15000,
     });
 
-    try { fs.unlinkSync(scriptPath); } catch { /* ignore */ }
+    try {
+      fs.unlinkSync(scriptPath);
+    } catch {
+      /* ignore */
+    }
 
     // nvim headless sends print() to stderr, not stdout
     // Strip ANSI escape sequences before parsing
-    const stripAnsi = (s: string) => s.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, "");
+    const ESC = String.fromCharCode(27);
+    const stripAnsi = (s: string) => s.replace(new RegExp(`${ESC}\\[[0-9;]*[a-zA-Z]`, "g"), "");
     const raw = stripAnsi(stderr || stdout);
 
     // Find the JSON array

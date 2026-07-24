@@ -7,10 +7,7 @@ import { SessionEntry, RecentDirEntry } from "./types";
 const XDG_STATE_HOME = process.env.XDG_STATE_HOME || path.join(os.homedir(), ".local/state");
 const SESSIONS_DIR = path.join(XDG_STATE_HOME, "nvim/sessions");
 const SHADA_PATH = path.join(XDG_STATE_HOME, "nvim/shada/main.shada");
-const RECENT_DIRS_PATH = path.join(
-  os.homedir(),
-  ".config/raycast/extensions/neovim-recent-dirs.json",
-);
+const RECENT_DIRS_PATH = path.join(os.homedir(), ".config/raycast/extensions/neovim-recent-dirs.json");
 
 // persistence.nvim encodes path separators as % and literal % as %%
 function decodeSessionFilename(filename: string): string {
@@ -18,7 +15,7 @@ function decodeSessionFilename(filename: string): string {
     .replace(/\.(vim|lua)$/, "")
     .replace(/^%/, "/")
     .replace(/%%/g, "\0") // temporarily replace literal %% with null
-    .replace(/%/g, "/")   // replace single % with /
+    .replace(/%/g, "/") // replace single % with /
     .replace(/\0/g, "%"); // restore literal %
 }
 
@@ -128,9 +125,7 @@ export function useSessions() {
 }
 
 export function trackRecentDir(dirPath: string) {
-  const dir = fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory()
-    ? dirPath
-    : path.dirname(dirPath);
+  const dir = fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory() ? dirPath : path.dirname(dirPath);
 
   let entries: RecentDirEntry[] = [];
   if (fs.existsSync(RECENT_DIRS_PATH)) {

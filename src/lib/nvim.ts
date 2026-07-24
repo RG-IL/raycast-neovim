@@ -11,11 +11,7 @@ const execFileAsync = promisify(execFile);
 export function findNvimPath(): string {
   if (nvimPath && nvimPath !== "nvim") return nvimPath;
 
-  const candidates = [
-    "/opt/homebrew/bin/nvim",
-    "/usr/local/bin/nvim",
-    "/usr/bin/nvim",
-  ];
+  const candidates = ["/opt/homebrew/bin/nvim", "/usr/local/bin/nvim", "/usr/bin/nvim"];
 
   for (const p of candidates) {
     try {
@@ -53,16 +49,22 @@ function buildStrategies(
       const suffix = Math.random().toString(36).slice(2, 8);
       const scriptPath = path.join(os.tmpdir(), `neovim-ghostty-${process.pid}-${suffix}.sh`);
       writeFileSync(scriptPath, `#!/bin/sh\ncd '${dir}' && ${cmd}\n`, { mode: 0o755 });
-      await execFileAsync("open", ["-na", "Ghostty.app", "--args", "-e", scriptPath], { timeout: 10000 });
+      await execFileAsync("open", ["-na", "Ghostty.app", "--args", "-e", scriptPath], {
+        timeout: 10000,
+      });
     },
     kitty: async () => {
       await execFileAsync("kitty", ["--directory", dir, nvimBin, ...args], { timeout: 10000 });
     },
     Alacritty: async () => {
-      await execFileAsync("alacritty", ["--working-directory", dir, "-e", nvimBin, ...args], { timeout: 10000 });
+      await execFileAsync("alacritty", ["--working-directory", dir, "-e", nvimBin, ...args], {
+        timeout: 10000,
+      });
     },
     WezTerm: async () => {
-      await execFileAsync("wezterm", ["start", "--cwd", dir, "--", "sh", "-c", cmd], { timeout: 10000 });
+      await execFileAsync("wezterm", ["start", "--cwd", dir, "--", "sh", "-c", cmd], {
+        timeout: 10000,
+      });
     },
     Terminal: async () => {
       const suffix = Math.random().toString(36).slice(2, 8);
@@ -99,9 +101,7 @@ async function tryStrategies(strategies: Array<() => Promise<void>>): Promise<vo
       errors.push(`Strategy ${i}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
-  throw new Error(
-    `Could not open Neovim in any terminal. Errors:\n${errors.join("\n")}`,
-  );
+  throw new Error(`Could not open Neovim in any terminal. Errors:\n${errors.join("\n")}`);
 }
 
 export async function openInNvim(targets: string[]): Promise<void> {

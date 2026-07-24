@@ -1,12 +1,4 @@
-import {
-  Action,
-  ActionPanel,
-  Grid,
-  Icon,
-  List,
-  showToast,
-  Toast,
-} from "@raycast/api";
+import { Action, ActionPanel, Grid, Icon, List, showToast, Toast } from "@raycast/api";
 import tildify from "tildify";
 import { useSessions } from "./lib/sessions";
 import { usePinnedEntries } from "./lib/pinned";
@@ -16,8 +8,7 @@ import { SessionEntry } from "./lib/types";
 
 export default function SearchRecentSessions() {
   const { data, isLoading, error, removeEntry } = useSessions();
-  const { pinnedEntries, pin, unpin, moveUp, moveDown, unpinAll, getAllowedMovements } =
-    usePinnedEntries();
+  const { pinnedEntries, pin, unpin, moveUp, moveDown, getAllowedMovements } = usePinnedEntries();
 
   if (error) {
     showToast(Toast.Style.Failure, "Failed to load sessions");
@@ -105,16 +96,19 @@ export default function SearchRecentSessions() {
   );
 }
 
-function buildActions(entry: SessionEntry, props: {
-  pinned?: boolean;
-  onOpen: () => void;
-  onPin: () => void;
-  onUnpin: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  onRemove: () => void;
-  movements: ("up" | "down")[];
-}) {
+function buildActions(
+  entry: SessionEntry,
+  props: {
+    pinned?: boolean;
+    onOpen: () => void;
+    onPin: () => void;
+    onUnpin: () => void;
+    onMoveUp: () => void;
+    onMoveDown: () => void;
+    onRemove: () => void;
+    movements: ("up" | "down")[];
+  },
+) {
   const prettyPath = tildify(entry.path);
   return (
     <ActionPanel>
@@ -123,15 +117,35 @@ function buildActions(entry: SessionEntry, props: {
       </ActionPanel.Section>
       <ActionPanel.Section>
         {!props.pinned ? (
-          <Action title="Pin Entry" icon={Icon.Pin} shortcut={{ modifiers: ["cmd"], key: "p" }} onAction={props.onPin} />
+          <Action
+            title="Pin Entry"
+            icon={Icon.Pin}
+            shortcut={{ modifiers: ["cmd", "shift"], key: "p" }}
+            onAction={props.onPin}
+          />
         ) : (
           <>
-            <Action title="Unpin Entry" icon={Icon.PinDisabled} shortcut={{ modifiers: ["cmd"], key: "p" }} onAction={props.onUnpin} />
+            <Action
+              title="Unpin Entry"
+              icon={Icon.PinDisabled}
+              shortcut={{ modifiers: ["ctrl"], key: "p" }}
+              onAction={props.onUnpin}
+            />
             {props.movements.includes("up") && (
-              <Action title="Move Up" icon={Icon.ArrowUp} shortcut={{ modifiers: ["cmd"], key: "u" }} onAction={props.onMoveUp} />
+              <Action
+                title="Move up"
+                icon={Icon.ArrowUp}
+                shortcut={{ modifiers: ["cmd"], key: "u" }}
+                onAction={props.onMoveUp}
+              />
             )}
             {props.movements.includes("down") && (
-              <Action title="Move Down" icon={Icon.ArrowDown} shortcut={{ modifiers: ["cmd"], key: "d" }} onAction={props.onMoveDown} />
+              <Action
+                title="Move Down"
+                icon={Icon.ArrowDown}
+                shortcut={{ modifiers: ["cmd"], key: "d" }}
+                onAction={props.onMoveDown}
+              />
             )}
           </>
         )}
