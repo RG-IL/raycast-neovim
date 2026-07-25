@@ -153,15 +153,17 @@ function buildActions(
       <ActionPanel.Section>
         <Action.CopyToClipboard title="Copy Path" content={prettyPath} shortcut={{ modifiers: ["cmd"], key: "c" }} />
       </ActionPanel.Section>
-      <ActionPanel.Section>
-        <Action
-          title="Remove from Recent"
-          icon={Icon.Trash}
-          style={Action.Style.Destructive}
-          shortcut={{ modifiers: ["cmd"], key: "backspace" }}
-          onAction={props.onRemove}
-        />
-      </ActionPanel.Section>
+      {entry.source === "recent" && (
+        <ActionPanel.Section>
+          <Action
+            title="Remove from Recent"
+            icon={Icon.Trash}
+            style={Action.Style.Destructive}
+            shortcut={{ modifiers: ["cmd"], key: "backspace" }}
+            onAction={props.onRemove}
+          />
+        </ActionPanel.Section>
+      )}
     </ActionPanel>
   );
 }

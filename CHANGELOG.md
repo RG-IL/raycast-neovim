@@ -1,6 +1,6 @@
 # Neovim Changelog
 
-## [Initial Version] - 2026-07-24
+## [Initial Version] - {PR_MERGE_DATE}
 
 - Search and open recent Neovim sessions (persistence.nvim, recent directories, shada)
 - Open selected Finder files/folders in Neovim

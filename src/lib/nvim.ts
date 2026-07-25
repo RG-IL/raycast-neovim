@@ -8,6 +8,16 @@ import { trackRecentDir } from "./sessions";
 
 const execFileAsync = promisify(execFile);
 
+/** Escape a string for safe use inside single-quoted shell context: ' → '\'' */
+function shellEscape(s: string): string {
+  return s.replace(/'/g, "'\\''");
+}
+
+/** Escape a string for use inside AppleScript double-quoted string: " and \ → escaped */
+function applescriptEscape(s: string): string {
+  return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
 export function findNvimPath(): string {
   if (nvimPath && nvimPath !== "nvim") return nvimPath;
 
@@ -39,7 +49,7 @@ function buildStrategies(
           activate
           set newWindow to (create window with default profile)
           tell current session of newWindow
-            write text "${shellCmd}"
+            write text "${applescriptEscape(shellCmd)}"
           end tell
         end tell
       `;
@@ -48,7 +58,7 @@ function buildStrategies(
     Ghostty: async () => {
       const suffix = Math.random().toString(36).slice(2, 8);
       const scriptPath = path.join(os.tmpdir(), `neovim-ghostty-${process.pid}-${suffix}.sh`);
-      writeFileSync(scriptPath, `#!/bin/sh\ncd '${dir}' && ${cmd}\n`, { mode: 0o755 });
+      writeFileSync(scriptPath, `#!/bin/sh\ncd '${shellEscape(dir)}' && ${cmd}\n`, { mode: 0o755 });
       await execFileAsync("open", ["-na", "Ghostty.app", "--args", "-e", scriptPath], {
         timeout: 10000,
       });
@@ -69,7 +79,7 @@ function buildStrategies(
     Terminal: async () => {
       const suffix = Math.random().toString(36).slice(2, 8);
       const scriptPath = path.join(os.tmpdir(), `neovim-terminal-${process.pid}-${suffix}.sh`);
-      writeFileSync(scriptPath, `#!/bin/sh\ncd '${dir}' && ${cmd}; exit\n`, { mode: 0o755 });
+      writeFileSync(scriptPath, `#!/bin/sh\ncd '${shellEscape(dir)}' && ${cmd}; exit\n`, { mode: 0o755 });
       await execFileAsync("open", ["-a", "Terminal", scriptPath], { timeout: 10000 });
     },
   };
@@ -83,10 +93,8 @@ function buildStrategies(
 
 function openInTerminal(nvimBin: string, args: string[], workingDir?: string): Promise<void> {
   const dir = workingDir || os.homedir();
-  const quotedNvim = `'${nvimBin}'`;
-  const nvimArgs = args.length > 0 ? args.map((a) => `'${a}'`).join(" ") : "";
-  const cmd = args.length > 0 ? `${quotedNvim} ${nvimArgs}` : quotedNvim;
-  const shellCmd = `cd '${dir}' && ${cmd}`;
+  const cmd = args.length > 0 ? `${shellEscape(nvimBin)} ${args.map(shellEscape).join(" ")}` : shellEscape(nvimBin);
+  const shellCmd = `cd '${shellEscape(dir)}' && ${cmd}`;
   const strategies = buildStrategies(nvimBin, args, dir, cmd, shellCmd);
   return tryStrategies(strategies);
 }

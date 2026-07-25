@@ -91,14 +91,28 @@ export async function getKeymaps(forceRefresh = false): Promise<KeymapEntry[]> {
     const stripAnsi = (s: string) => s.replace(new RegExp(`${ESC}\\[[0-9;]*[a-zA-Z]`, "g"), "");
     const raw = stripAnsi(stderr || stdout);
 
-    // Find the JSON array
-    const firstBracket = raw.indexOf("[");
-    const lastBracket = raw.lastIndexOf("]");
-    if (firstBracket < 0 || lastBracket <= firstBracket) {
-      throw new Error("No JSON array found in nvim output");
+    // Find the JSON array using bracket-depth counting to avoid matching
+    // stray brackets from startup messages or sourced file output.
+    const jsonStart = raw.indexOf("[{");
+    if (jsonStart < 0) {
+      throw new Error("No JSON keymap array found in nvim output");
     }
 
-    const json = raw.substring(firstBracket, lastBracket + 1);
+    let depth = 0;
+    let jsonEnd = -1;
+    for (let i = jsonStart; i < raw.length; i++) {
+      if (raw[i] === "[") depth++;
+      if (raw[i] === "]") depth--;
+      if (depth === 0) {
+        jsonEnd = i;
+        break;
+      }
+    }
+    if (jsonEnd < 0) {
+      throw new Error("Unterminated JSON keymap array in nvim output");
+    }
+
+    const json = raw.substring(jsonStart, jsonEnd + 1);
     const parsed = JSON.parse(json);
 
     const userLhs = new Set<string>();
@@ -121,8 +135,8 @@ export async function getKeymaps(forceRefresh = false): Promise<KeymapEntry[]> {
 
     cachedKeymaps = userKeymaps;
     return cachedKeymaps!;
-  } catch {
-    return [];
+  } catch (err) {
+    throw new Error(`Failed to load keymaps: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 

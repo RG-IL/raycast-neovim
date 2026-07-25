@@ -6,6 +6,9 @@
   "icon": "icon.png",
   "author": "raphael",
   "license": "MIT",
+  "categories": [
+    "Developer Tools"
+  ],
   "keywords": [
     "neovim",
     "nvim",
